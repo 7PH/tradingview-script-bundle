@@ -1,0 +1,69 @@
+// This source code is subject to the terms of the Mozilla Public License 2.0 at https://mozilla.org/MPL/2.0/
+// © PowerHat
+
+//@version=4
+
+// Title
+study(title="3MA + Bollinger Bands", shorttitle="3MA + BB", overlay=true)
+
+
+
+// SuperTrend
+atrPeriod = input(10, "ATR Length")
+factor = input(3, "Factor")
+[supertrend, direction] = supertrend(factor, atrPeriod)
+bodyMiddle = plot((open + close) / 2, display=display.none)
+upTrend = plot(direction < 0 ? supertrend : na, "Up Trend", color = color.green, style=plot.style_linebr)
+downTrend = plot(direction < 0? na : supertrend, "Down Trend", color = color.red, style=plot.style_linebr)
+fill(bodyMiddle, upTrend, color.new(color.green, 90), fillgaps=false)
+fill(bodyMiddle, downTrend, color.new(color.red, 90), fillgaps=false)
+
+
+
+
+// Inputs
+len_bb = input(20, minval=1, title="BB Length")
+mult = input(2.0, minval=0.001, maxval=50, title="StdDev")
+bbp = input (100, minval=3, title ="BBand Pinch length")
+myMAc = input(false, "Tick On: EMA. Off: SMA")
+len_fast = input(type=input.integer, defval=50,  minval=1, title="MA Fast Length")
+resfast = input(title="MA Timeframe", type=input.resolution, defval="")
+len_std = input(type=input.integer, defval=100, minval=2, title="MA Standard Length")
+resstd = input(title="MA Timeframe", type=input.resolution, defval="")
+len_slow = input(type=input.integer, defval=200, minval=3, title="MA Slow Length")
+resslow = input(title="MA Timeframe", type=input.resolution, defval="")
+
+src = input(close, title="Source")
+
+
+// BB
+basis = sma(src, len_bb)
+dev = mult * stdev(src, len_bb)
+bbbw = bbw(close, len_bb, mult)
+upper = basis + dev
+lower = max(0.1, basis - dev)
+Lowestbbw = lowest(bbbw, bbp)[1]
+
+plot(basis, color=#2962ff, title="BB Basis", transp=80)
+p1 = plot(upper, color=#2962ff, title="BB Upper", transp=100)
+p2 = plot(lower, color=#2962ff, title="BB Lower", transp=100)
+plot(bbbw <= Lowestbbw ? upper : na, style = plot.style_linebr, linewidth=5, color=color.blue, transp=25, title='BBand Pinch Coloru')
+plot(bbbw <= Lowestbbw ? lower : na, style = plot.style_linebr, linewidth=5, color=color.blue, transp=25, title='BBand Pinch Colord')
+fill(p1, p2, color=iff(bbbw <= Lowestbbw, #2962ff, na), transp=50, title= "Pinch Background")
+
+
+// MA 50
+fastmaOut = myMAc ? ema(src, len_fast) : sma(src, len_fast)
+fastMARes = security(syminfo.tickerid, resfast, fastmaOut, barmerge.gaps_off, barmerge.lookahead_off)    
+plot(fastMARes, style=plot.style_line, color=color.blue, title="Fast MA", linewidth=1, transp=50) 
+
+// MA 100
+standardmaOut = myMAc ? ema(src, len_std) : sma(src, len_std)
+stdMARes = security(syminfo.tickerid, resstd, standardmaOut, barmerge.gaps_off, barmerge.lookahead_off)
+plot(stdMARes, style=plot.style_line, color=color.blue, title="Standard MA", linewidth=1, transp=20)
+
+// MA 200
+slowmaOut = myMAc ? ema(src, len_slow) : sma(src, len_slow)
+slowMARes = security(syminfo.tickerid, resslow, slowmaOut, barmerge.gaps_off, barmerge.lookahead_off)
+plot(slowMARes, style=plot.style_line, color=color.orange, title="Slow MA", linewidth=3, transp=30)
+
