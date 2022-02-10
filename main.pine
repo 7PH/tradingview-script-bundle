@@ -4,8 +4,13 @@
 //@version=4
 
 // Title
-study(title="3MA + Bollinger Bands", shorttitle="3MA + BB", overlay=true)
+study(title="SuperTrend + 3MA + Bollinger Bands", shorttitle="ST + 3MA + BB", overlay=true)
 
+// cyan:       #B2EBF2
+// blue:       #3179F5
+// purple 3:   #e91e63
+// purple 2:   #9c27b0
+// purple 1:   #673ab7
 
 
 // SuperTrend
@@ -13,12 +18,10 @@ atrPeriod = input(10, "ATR Length")
 factor = input(3, "Factor")
 [supertrend, direction] = supertrend(factor, atrPeriod)
 bodyMiddle = plot((open + close) / 2, display=display.none)
-upTrend = plot(direction < 0 ? supertrend : na, "Up Trend", color = color.green, style=plot.style_linebr)
-downTrend = plot(direction < 0? na : supertrend, "Down Trend", color = color.red, style=plot.style_linebr)
-fill(bodyMiddle, upTrend, color.new(color.green, 90), fillgaps=false)
-fill(bodyMiddle, downTrend, color.new(color.red, 90), fillgaps=false)
-
-
+upTrend = plot(direction < 0 ? supertrend : na, "Up Trend", color=#B2EBF2, style=plot.style_linebr)
+downTrend = plot(direction < 0? na : supertrend, "Down Trend", color=#3179F5, style=plot.style_linebr)
+fill(bodyMiddle, upTrend, color.new(#B2EBF2, 90), fillgaps=false)
+fill(bodyMiddle, downTrend, color.new(#3179F5, 90), fillgaps=false)
 
 
 // Inputs
@@ -44,7 +47,7 @@ upper = basis + dev
 lower = max(0.1, basis - dev)
 Lowestbbw = lowest(bbbw, bbp)[1]
 
-plot(basis, color=#2962ff, title="BB Basis", transp=80)
+plot(basis, color=#2962ff, title="BB Basis", transp=80, display=display.none)
 p1 = plot(upper, color=#2962ff, title="BB Upper", transp=100)
 p2 = plot(lower, color=#2962ff, title="BB Lower", transp=100)
 plot(bbbw <= Lowestbbw ? upper : na, style = plot.style_linebr, linewidth=5, color=color.blue, transp=25, title='BBand Pinch Coloru')
@@ -55,15 +58,15 @@ fill(p1, p2, color=iff(bbbw <= Lowestbbw, #2962ff, na), transp=50, title= "Pinch
 // MA 50
 fastmaOut = myMAc ? ema(src, len_fast) : sma(src, len_fast)
 fastMARes = security(syminfo.tickerid, resfast, fastmaOut, barmerge.gaps_off, barmerge.lookahead_off)    
-plot(fastMARes, style=plot.style_line, color=color.blue, title="Fast MA", linewidth=1, transp=50) 
+plot(fastMARes, style=plot.style_line, color=#673ab7, title="Fast MA", linewidth=1, transp=75) 
 
 // MA 100
 standardmaOut = myMAc ? ema(src, len_std) : sma(src, len_std)
 stdMARes = security(syminfo.tickerid, resstd, standardmaOut, barmerge.gaps_off, barmerge.lookahead_off)
-plot(stdMARes, style=plot.style_line, color=color.blue, title="Standard MA", linewidth=1, transp=20)
+plot(stdMARes, style=plot.style_line, color=#9c27b0, title="Standard MA", linewidth=1, transp=50)
 
 // MA 200
 slowmaOut = myMAc ? ema(src, len_slow) : sma(src, len_slow)
 slowMARes = security(syminfo.tickerid, resslow, slowmaOut, barmerge.gaps_off, barmerge.lookahead_off)
-plot(slowMARes, style=plot.style_line, color=color.orange, title="Slow MA", linewidth=3, transp=30)
+plot(slowMARes, style=plot.style_line, color=#e91e63, title="Slow MA", linewidth=3, transp=25)
 
