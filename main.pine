@@ -4,13 +4,33 @@
 //@version=4
 
 // Title
-study(title="SuperTrend + 3MA + Bollinger Bands", shorttitle="ST + 3MA + BB", overlay=true)
+study(title="Ichimoku + SuperTrend + 3MA + Bollinger Bands", shorttitle="ICH + ST + 3MA + BB", overlay=true)
 
 // cyan:       #B2EBF2
 // blue:       #3179F5
 // purple 3:   #e91e63
 // purple 2:   #9c27b0
 // purple 1:   #673ab7
+
+
+
+// Ichimoku
+conversionPeriods = input(9, minval=1, title="Conversion Line Length")
+basePeriods = input(26, minval=1, title="Base Line Length")
+laggingSpan2Periods = input(52, minval=1, title="Leading Span B Length")
+displacement = input(26, minval=1, title="Displacement")
+donchian(len) => avg(lowest(len), highest(len))
+conversionLine = donchian(conversionPeriods)
+baseLine = donchian(basePeriods)
+leadLine1 = avg(conversionLine, baseLine)
+leadLine2 = donchian(laggingSpan2Periods)
+plot(conversionLine, color=#e91e63, title="Conversion Line")
+plot(baseLine, color=#9c27b0, title="Base Line", display=display.none)
+plot(close, offset=- displacement + 1, color=#673ab7, title="Lagging Span", display=display.none)
+pp1 = plot(leadLine1, offset=(displacement - 1), color=#A5D6A7, title="Leading Span A", display=display.none)
+pp2 = plot(leadLine2, offset=(displacement - 1), color=#EF9A9A, title="Leading Span B", display=display.none)
+fill(pp1, pp2, color=(leadLine1 > leadLine2 ? #FFFFFF : #666666), transp=75)
+
 
 
 // SuperTrend
@@ -58,12 +78,12 @@ fill(p1, p2, color=iff(bbbw <= Lowestbbw, #2962ff, na), transp=50, title= "Pinch
 // MA 50
 fastmaOut = myMAc ? ema(src, len_fast) : sma(src, len_fast)
 fastMARes = security(syminfo.tickerid, resfast, fastmaOut, barmerge.gaps_off, barmerge.lookahead_off)    
-plot(fastMARes, style=plot.style_line, color=#673ab7, title="Fast MA", linewidth=1, transp=75) 
+plot(fastMARes, style=plot.style_line, color=#673ab7, title="Fast MA", linewidth=1, transp=75, display=display.none) 
 
 // MA 100
 standardmaOut = myMAc ? ema(src, len_std) : sma(src, len_std)
 stdMARes = security(syminfo.tickerid, resstd, standardmaOut, barmerge.gaps_off, barmerge.lookahead_off)
-plot(stdMARes, style=plot.style_line, color=#9c27b0, title="Standard MA", linewidth=1, transp=50)
+plot(stdMARes, style=plot.style_line, color=#9c27b0, title="Standard MA", linewidth=1, transp=50, display=display.none)
 
 // MA 200
 slowmaOut = myMAc ? ema(src, len_slow) : sma(src, len_slow)
